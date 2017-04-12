@@ -1,0 +1,75 @@
+#!/bin/bash
+
+# This script should help by updating the operating system and installing
+# any required applications from pkgs as well as moving apps
+# It will also uninstall different applications
+
+# Delete old updates settings
+
+rm -R /Users/Shared/MACOS/
+rm /Volumes/BACKUPS/Extra/apps.txt
+
+# Application Location
+
+APP_PATH=/Applications/
+
+## Formatting Color of Text
+TEXT_RED=`tput setaf 9`
+TEXT_GRAY=`tput setaf 8`
+TEXT_SILVER=`tput setaf 7`
+TEXT_AQUA=`tput setaf 6`
+TEXT_PURPLE=`tput setaf 5`
+TEXT_BLUE=`tput setaf 4`
+TEXT_YELLOW=`tput setaf 3`
+TEXT_GREEN=`tput setaf 2`
+TEXT_MAROON=`tput setaf 1`
+TEXT_NORMAL=`tput setaf 0`
+END_COLOR=`tput op`
+
+## Read for current 0S version 
+echo "$TEXT_AQUA What is the latest MAC OS version $TEXT_RED ie: (10.11) you will write 11 $TEXT_BLUE"
+read CURRENTVERSION
+set -- $CURRENTVERSION
+
+## GET OSVERSION
+OSVERSION=`sw_vers | grep ProductVersion | awk '{ print $2; }'`
+OIFS=$IFS
+IFS='.'
+
+set -- $OSVERSION
+
+# TEST AND UPDATE OS VERSION
+if [ $CURRENTVERSION \> $2 ];
+then
+    echo "$TEXT_GREEN Your current mac OS version is $TEXT_AQUA $OSVERSION $TEXT_GREEN Your mac OS is up to date" $END_COLOR;
+else
+    echo "$TEXT_RED Your mac OS is out of date, do you want to update? (y/n)" $TEXT_BLUE;
+    read UPDATEOS
+    if [ $UPDATEOS == "y" ] || [ $UPDATEOS == "Y" ]; 
+        then 
+            echo "$TEXT_PURPLE Updating mac OS ... $END_COLOR"
+            rsync -Pa /Volumes/BACKUPS/macOS/   /Users/Shared/MACOS/
+            open /Users/Shared/MACOS/*
+            exit;
+    else 
+        echo "$TEXT_RED User CANCELED mac OS update" $END_COLOR;
+    fi;
+fi;
+
+# INSTALL THE UPDATES
+
+echo "$TEXT_YELLOW Do you want to install the new software? (y/n) " $TEXT_BLUE
+read UPDATES
+if [ $UPDATES == "Y" ] || [ $UPDATES == "y" ];
+    then
+        echo "$TEXT_PURPLE Installing updates ... " $TEXT_AQUA
+
+    else
+        echo "$TEXT_RED UPDATES WERE NOT INSTALLED ..." $TEXT_AQUA
+fi;
+
+ls /Volumes/BACKUPS/Applications >> /Volumes/BACKUPS/Extra/apps.txt 
+
+cat /Volumes/BACKUPS/Extra/apps.txt
+
+echo "$TEXT_MAROON THANK YOU FOR USING THE AUTOMATIC UPDATER" $END_COLOR
